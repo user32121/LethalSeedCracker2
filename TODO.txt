@@ -1,0 +1,2 @@
+turrets blocking doorways, closed secure door count, locked door count, hallways intersecting in a glitchy way, total room count, lightning strike count per stormy day, automatically roaming bees / agitated sapsuckers, distance between main and fire doors, total steam valves broken during a day
+also hoarding bug nest positions intersecting with spike traps
