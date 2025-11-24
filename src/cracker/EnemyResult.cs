@@ -1,4 +1,5 @@
 ﻿using LethalSeedCracker2.Patches;
+using LethalSeedCracker2.src.config;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace LethalSeedCracker2.src.cracker
         internal bool indoorFog;
         internal int roamingBees;
 
-        public EnemyResult()
+        public EnemyResult(Config config)
         {
             if (RoundManager.Instance.enemyRushIndex != -1)
             {
@@ -20,13 +21,16 @@ namespace LethalSeedCracker2.src.cracker
             }
             indoorFog = RoundManager.Instance.indoorFog.isActiveAndEnabled;
             enemyCounts = [];
-            foreach (var enemy in Object.FindObjectsOfType<EnemyAI>())
+            if (!config.skipEnemies)
             {
-                int count = enemyCounts.GetValueOrDefault(enemy.enemyType);
-                enemyCounts[enemy.enemyType] = count + 1;
-            }
+                foreach (var enemy in Object.FindObjectsOfType<EnemyAI>())
+                {
+                    int count = enemyCounts.GetValueOrDefault(enemy.enemyType);
+                    enemyCounts[enemy.enemyType] = count + 1;
+                }
 
-            roamingBees = BeeState.roamingBees.Count;
+                roamingBees = BeeState.roamingBees.Count;
+            }
             BeeState.roamingBees.Clear();
         }
 

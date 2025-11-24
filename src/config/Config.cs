@@ -16,6 +16,11 @@ namespace LethalSeedCracker2.src.config
         internal int daysPlayersSurvivedInARow = 0;
         private bool ignorepower;
         internal bool eclipsed;
+        internal bool skipEnemies;
+        internal bool skipTraps;
+        internal bool skipOutsideObjects;
+        internal bool skipScrap;
+        internal bool skipWeather;
 
         internal int foundSeeds = 0;
 
@@ -39,6 +44,11 @@ namespace LethalSeedCracker2.src.config
             new ConfigParameter<SelectableLevel>("moon", ParseMoon, "moon", (config, moon) => config.currentLevel = moon),
             new ConfigParameter("eclipsed", config => config.eclipsed = true),
             new ConfigParameter("ignorepower", config => config.ignorepower = true),
+            new ConfigParameter("skipenemies", config => config.skipEnemies = true),
+            new ConfigParameter("skiptraps", config => config.skipTraps = true),
+            new ConfigParameter("skipoutsideobjects", config => config.skipOutsideObjects = true),
+            new ConfigParameter("skipscrap", config => config.skipScrap = true),
+            new ConfigParameter("skipweather", config => config.skipWeather = true),
 
             new ConfigFilter<Defines.DUNGEON>("dungeon", ParseEnum<Defines.DUNGEON>, Defines.DUNGEON.INVALID, "dungeon", (result, dungeon) => dungeon == Defines.DUNGEON.INVALID || dungeon == result.levelResult.currentDungeonType),
             new ConfigFilter<EnemyType?>("infestation", ParseEnemy, null, "enemy", (result, enemy) => enemy == null || enemy == result.enemyResult.infestation),

@@ -1,4 +1,5 @@
 ﻿using LethalSeedCracker2.Patches;
+using LethalSeedCracker2.src.config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace LethalSeedCracker2.src.cracker
         internal int numVents;
         internal Dictionary<EntranceTeleport, Tuple<Component, float>> nearestEntranceTraps = [];
 
-        public LevelResult()
+        public LevelResult(Config config)
         {
             currentDungeonType = RoundManager.Instance.currentDungeonType switch
             {
@@ -43,48 +44,54 @@ namespace LethalSeedCracker2.src.cracker
             numMeteors = MeteorShowersPatch.numMeteors;
             numVents = UnityEngine.Object.FindObjectsOfType<EnemyVent>().Length;
 
-            var mines = UnityEngine.Object.FindObjectsOfType<Landmine>();
-            if (mines.Length > 0)
+            if (!config.skipTraps)
             {
-                trapCounts[TRAP.LANDMINE] = mines.Length;
-            }
-            var turrets = UnityEngine.Object.FindObjectsOfType<Turret>();
-            if (turrets.Length > 0)
-            {
-                trapCounts[TRAP.TURRET] = turrets.Length;
-            }
-            var spikes = UnityEngine.Object.FindObjectsOfType<SpikeRoofTrap>();
-            if (spikes.Length > 0)
-            {
-                trapCounts[TRAP.SPIKETRAP] = spikes.Length;
-            }
-            var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
-            var traps = mines.OfType<Component>().Concat(turrets).Concat(spikes);
-            foreach (var entrance in entrances)
-            {
-                if (entrance.isEntranceToBuilding)
+                var mines = UnityEngine.Object.FindObjectsOfType<Landmine>();
+                if (mines.Length > 0)
                 {
-                    continue;
+                    trapCounts[TRAP.LANDMINE] = mines.Length;
                 }
-                foreach (var trap in traps)
+                var turrets = UnityEngine.Object.FindObjectsOfType<Turret>();
+                if (turrets.Length > 0)
                 {
-                    var best = nearestEntranceTraps.GetValueOrDefault(entrance, new(trap, float.PositiveInfinity));
-                    var dist = Vector3.Distance(trap.transform.position, entrance.transform.position);
-                    if (dist < best.Item2)
+                    trapCounts[TRAP.TURRET] = turrets.Length;
+                }
+                var spikes = UnityEngine.Object.FindObjectsOfType<SpikeRoofTrap>();
+                if (spikes.Length > 0)
+                {
+                    trapCounts[TRAP.SPIKETRAP] = spikes.Length;
+                }
+                var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
+                var traps = mines.OfType<Component>().Concat(turrets).Concat(spikes);
+                foreach (var entrance in entrances)
+                {
+                    if (entrance.isEntranceToBuilding)
                     {
-                        nearestEntranceTraps[entrance] = new(trap, dist);
+                        continue;
+                    }
+                    foreach (var trap in traps)
+                    {
+                        var best = nearestEntranceTraps.GetValueOrDefault(entrance, new(trap, float.PositiveInfinity));
+                        var dist = Vector3.Distance(trap.transform.position, entrance.transform.position);
+                        if (dist < best.Item2)
+                        {
+                            nearestEntranceTraps[entrance] = new(trap, dist);
+                        }
                     }
                 }
             }
 
-            foreach (Transform item in RoundManager.Instance.mapPropsContainer.transform)
+            if (!config.skipOutsideObjects)
             {
-                foreach (var item2 in RoundManager.Instance.currentLevel.spawnableOutsideObjects)
+                foreach (Transform item in RoundManager.Instance.mapPropsContainer.transform)
                 {
-                    if (item.name.Contains(item2.spawnableObject.prefabToSpawn.name))
+                    foreach (var item2 in RoundManager.Instance.currentLevel.spawnableOutsideObjects)
                     {
-                        int count = outsideObjectCounts.GetValueOrDefault(item2.spawnableObject.name);
-                        outsideObjectCounts[item2.spawnableObject.name] = count + 1;
+                        if (item.name.Contains(item2.spawnableObject.prefabToSpawn.name))
+                        {
+                            int count = outsideObjectCounts.GetValueOrDefault(item2.spawnableObject.name);
+                            outsideObjectCounts[item2.spawnableObject.name] = count + 1;
+                        }
                     }
                 }
             }

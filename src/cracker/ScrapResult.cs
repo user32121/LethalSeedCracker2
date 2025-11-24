@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LethalSeedCracker2.src.config;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LethalSeedCracker2.src.cracker
@@ -9,20 +10,23 @@ namespace LethalSeedCracker2.src.cracker
         internal int totalScrapValue;
         internal Dictionary<Item, int> scrapCounts;
 
-        public ScrapResult()
+        public ScrapResult(Config config)
         {
             numScrap = 0;
             scrapCounts = [];
             totalScrapValue = 0;
-            GrabbableObject[] items = UnityEngine.Object.FindObjectsOfType<GrabbableObject>();
-            for (int i = 0; i < items.Length; i++)
+            if (!config.skipScrap)
             {
-                if (items[i].itemProperties.isScrap && !items[i].isInShipRoom && !items[i].isInElevator)
+                GrabbableObject[] items = UnityEngine.Object.FindObjectsOfType<GrabbableObject>();
+                for (int i = 0; i < items.Length; i++)
                 {
-                    totalScrapValue += items[i].scrapValue;
-                    numScrap++;
-                    int count = scrapCounts.GetValueOrDefault(items[i].itemProperties);
-                    scrapCounts[items[i].itemProperties] = count + 1;
+                    if (items[i].itemProperties.isScrap && !items[i].isInShipRoom && !items[i].isInElevator)
+                    {
+                        totalScrapValue += items[i].scrapValue;
+                        numScrap++;
+                        int count = scrapCounts.GetValueOrDefault(items[i].itemProperties);
+                        scrapCounts[items[i].itemProperties] = count + 1;
+                    }
                 }
             }
         }

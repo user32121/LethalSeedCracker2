@@ -1,32 +1,20 @@
-﻿using System;
+﻿using LethalSeedCracker2.src.config;
+using System;
 using System.IO;
 
 namespace LethalSeedCracker2.src.cracker
 {
-    internal class CrackingResult
+    internal class CrackingResult(Config config)
     {
-        internal int seed;
-        internal SelectableLevel currentLevel;
-        internal int daysUntilDeadline;
-        internal int daysPlayersSurvivedInARow;
-        internal bool eclipsed;
-        internal LevelResult levelResult;
-        internal ScrapResult scrapResult;
-        internal EnemyResult enemyResult;
-        internal WeatherResult weatherResult;
-
-        public CrackingResult()
-        {
-            seed = StartOfRound.Instance.randomMapSeed;
-            currentLevel = StartOfRound.Instance.currentLevel;
-            daysUntilDeadline = TimeOfDay.Instance.daysUntilDeadline;
-            daysPlayersSurvivedInARow = StartOfRound.Instance.daysPlayersSurvivedInARow;
-            eclipsed = TimeOfDay.Instance.currentLevelWeather == LevelWeatherType.Eclipsed;
-            levelResult = new();
-            scrapResult = new();
-            enemyResult = new();
-            weatherResult = new();
-        }
+        internal int seed = StartOfRound.Instance.randomMapSeed;
+        internal SelectableLevel currentLevel = StartOfRound.Instance.currentLevel;
+        internal int daysUntilDeadline = TimeOfDay.Instance.daysUntilDeadline;
+        internal int daysPlayersSurvivedInARow = StartOfRound.Instance.daysPlayersSurvivedInARow;
+        internal bool eclipsed = TimeOfDay.Instance.currentLevelWeather == LevelWeatherType.Eclipsed;
+        internal LevelResult levelResult = new(config);
+        internal ScrapResult scrapResult = new(config);
+        internal EnemyResult enemyResult = new(config);
+        internal WeatherResult weatherResult = new(config);
 
         internal void Save(string fileName, bool append)
         {

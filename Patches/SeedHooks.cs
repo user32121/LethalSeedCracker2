@@ -47,7 +47,7 @@ namespace LethalSeedCracker2.Patches
                 LethalSeedCracker2.Logger.LogInfo("No config loaded; not collecting results");
                 return;
             }
-            CrackingResult result = new();
+            CrackingResult result = new(SeedCracker.config);
             LethalSeedCracker2.Logger.LogInfo(result);
             if (SeedCracker.config.Filter(result))
             {
