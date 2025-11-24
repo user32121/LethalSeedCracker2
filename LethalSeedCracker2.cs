@@ -1,14 +1,10 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using LobbyCompatibility.Attributes;
-using LobbyCompatibility.Enums;
 
 namespace LethalSeedCracker2;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.HardDependency)]
-[LobbyCompatibility(CompatibilityLevel.ClientOnly, VersionStrictness.None)]
 public class LethalSeedCracker2 : BaseUnityPlugin
 {
     public static LethalSeedCracker2 Instance { get; private set; } = null!;

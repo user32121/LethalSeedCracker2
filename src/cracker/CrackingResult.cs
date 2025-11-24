@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace LethalSeedCracker2.Patches
+namespace LethalSeedCracker2.src.cracker
 {
     internal class CrackingResult
     {

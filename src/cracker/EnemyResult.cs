@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace LethalSeedCracker2.Patches
+namespace LethalSeedCracker2.src.cracker
 {
     internal class EnemyResult
     {

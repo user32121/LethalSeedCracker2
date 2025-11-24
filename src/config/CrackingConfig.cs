@@ -1,13 +1,14 @@
 ﻿using EasyTextEffects.Editor.MyBoxCopy.Extensions;
+using LethalSeedCracker2.src.cracker;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static LethalSeedCracker2.Patches.Defines;
+using static LethalSeedCracker2.src.cracker.Defines;
 
-namespace LethalSeedCracker2.Patches
+namespace LethalSeedCracker2.src.config
 {
-    internal class CrackingConfig
+    internal class CrackingConfigq
     {
         //parameters
         internal int curSeedIdx = 0;
@@ -44,7 +45,7 @@ namespace LethalSeedCracker2.Patches
 
         private static bool IContains(string text, string substr) => substr.Length > 0 && text.Contains(substr, StringComparison.InvariantCultureIgnoreCase);
 
-        public CrackingConfig(string fileName)
+        public CrackingConfigq(string fileName)
         {
             //ensure folder exists
             string folderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "32121", "LethalSeedCracker");

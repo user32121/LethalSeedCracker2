@@ -1,11 +1,12 @@
 using HarmonyLib;
+using LethalSeedCracker2.src.config;
 
 namespace LethalSeedCracker2.Patches;
 
 [HarmonyPatch(typeof(RoundManager))]
 public class SeedCracker
 {
-    internal static CrackingConfig? config;
+    internal static Config? config;
 
     [HarmonyPatch("Start")]
     [HarmonyPrefix]

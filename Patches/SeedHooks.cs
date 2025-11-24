@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using LethalSeedCracker2.src.cracker;
 using System;
 
 namespace LethalSeedCracker2.Patches
@@ -48,7 +49,7 @@ namespace LethalSeedCracker2.Patches
             }
             CrackingResult result = new();
             LethalSeedCracker2.Logger.LogInfo(result);
-            if (SeedCracker.config.CheckFilter(result))
+            if (SeedCracker.config.Filter(result))
             {
                 LethalSeedCracker2.Logger.LogInfo("Passed filter");
                 result.Save("results2.txt", SeedCracker.config.curSeedIdx != 0);

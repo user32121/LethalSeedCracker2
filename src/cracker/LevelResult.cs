@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LethalSeedCracker2.Patches;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static LethalSeedCracker2.Patches.Defines;
+using static LethalSeedCracker2.src.cracker.Defines;
 
-namespace LethalSeedCracker2.Patches
+namespace LethalSeedCracker2.src.cracker
 {
     internal class LevelResult
     {

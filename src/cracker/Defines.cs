@@ -1,4 +1,4 @@
-﻿namespace LethalSeedCracker2.Patches
+﻿namespace LethalSeedCracker2.src.cracker
 {
     internal class Defines
     {

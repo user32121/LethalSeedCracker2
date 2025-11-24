@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace LethalSeedCracker2.Patches
+namespace LethalSeedCracker2.src.cracker
 {
     internal class ScrapResult
     {
