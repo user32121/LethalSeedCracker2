@@ -17,6 +17,8 @@ namespace LethalSeedCracker2.src.config
         private bool ignorepower;
         internal bool eclipsed;
 
+        internal int foundSeeds = 0;
+
         //convenience name mappings
         private static readonly Dictionary<string, string> colloquialNames = new()
         {
@@ -84,7 +86,8 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilter("blackout", (result, blackout) => !blackout || result.levelResult.blackout),
             new ConfigFilter<CompanyMood?>("companymood", ParseCompanyMood, null, "mood", (result, mood) => mood == null || mood == result.levelResult.currentCompanyMood),
             new ConfigFilter("indoorfog", (result, indoorfog) => !indoorfog || result.enemyResult.indoorFog),
-            new ConfigFilter<Func<float, float, bool>?, int>("closesttrap", ParseComparator, null, "comparator", ParseInt, 0, "num", (result, op, num) => op == null || !op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
+            new ConfigFilter<Func<float, float, bool>?, float>("closesttrap", ParseComparator, null, "comparator", ParseFloat, 0, "num", (result, op, num) => op == null || op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
+            new ConfigFilter<Func<float, float, bool>?, int>("roamingbees", ParseComparator, null, "comparator", ParseInt, 0, "num", (result, op, num) => op == null || op(result.enemyResult.roamingBees, num)),
         ];
 
         private static readonly Dictionary<string, Func<float, float, bool>> comparators = new()

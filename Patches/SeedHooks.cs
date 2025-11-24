@@ -52,7 +52,8 @@ namespace LethalSeedCracker2.Patches
             if (SeedCracker.config.Filter(result))
             {
                 LethalSeedCracker2.Logger.LogInfo("Passed filter");
-                result.Save("results2.txt", SeedCracker.config.curSeedIdx != 0);
+                result.Save("results2.txt", SeedCracker.config.foundSeeds != 0);
+                ++SeedCracker.config.foundSeeds;
             }
             else
             {
