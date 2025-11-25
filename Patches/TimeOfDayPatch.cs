@@ -12,7 +12,7 @@ namespace LethalSeedCracker2.Patches
         [HarmonyPrefix]
         public static void SetTimeSpeed(TimeOfDay __instance)
         {
-            __instance.globalTimeSpeedMultiplier = __instance.lengthOfHours * 4;
+            __instance.globalTimeSpeedMultiplier = __instance.lengthOfHours * 2;
             LethalSeedCracker2.Logger.LogInfo($"Set time speed multiplier to {__instance.globalTimeSpeedMultiplier}");
             float speed = StartOfRound.Instance.shipAnimator.GetComponent<Animator>().speed *= 10f;
             LethalSeedCracker2.Logger.LogInfo($"Set ship speed to {speed}");

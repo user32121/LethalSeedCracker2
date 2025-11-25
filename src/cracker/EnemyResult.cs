@@ -29,9 +29,16 @@ namespace LethalSeedCracker2.src.cracker
                     enemyCounts[enemy.enemyType] = count + 1;
                 }
 
-                roamingBees = BeeState.roamingBees.Count;
+                roamingBees = 0;
+                foreach (var bees in BeeState.roamingBees)
+                {
+                    LethalSeedCracker2.Logger.LogInfo($"bee {bees.Key.GetHashCode()}: roaming {bees.Value}/{BeeState.totalTicks}");
+                    if (bees.Value >= BeeState.totalTicks / 2)
+                    {
+                        ++roamingBees;
+                    }
+                }
             }
-            BeeState.roamingBees.Clear();
         }
 
         public override string ToString()

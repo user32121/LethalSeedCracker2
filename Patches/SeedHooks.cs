@@ -11,7 +11,7 @@ namespace LethalSeedCracker2.Patches
         [HarmonyPrefix]
         public static void SetSeed(StartOfRound __instance)
         {
-            BeeState.roamingBees.Clear();
+            BeeState.Reset();
 
             if (SeedCracker.config is null)
             {
