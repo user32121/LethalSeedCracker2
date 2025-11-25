@@ -85,7 +85,7 @@ namespace LethalSeedCracker2.src.config
         {
             base.Parse(config, args);
             List<T0> arg0s = [];
-            for (int i = 1; i < args.Length; ++i)
+            for (int i = 0; i < args.Length; ++i)
             {
                 arg0s.Add(parser0(config, args[i]));
             }
