@@ -38,6 +38,7 @@ namespace LethalSeedCracker2.src.config
         private readonly List<BaseConfigCommand> commands =
         [
             new ConfigParameter<int>("seed", ParseInt, "seed", (config, seed) => config.seeds.Add(seed)),
+            new ConfigParameterList<int>("seeds", ParseInt, "seed", (config, seeds) => config.seeds.AddRange(seeds)),
             new ConfigParameter<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
             new ConfigParameter<int>("daystildeadline", ParseInt, "days", (config, days) => config.daysUntilDeadline = days),
             new ConfigParameter<int>("dayssurvived", ParseInt, "days", (config, days) => config.daysPlayersSurvivedInARow = days),

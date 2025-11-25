@@ -1,5 +1,6 @@
 ﻿using LethalSeedCracker2.src.common;
 using System;
+using System.Collections.Generic;
 
 namespace LethalSeedCracker2.src.config
 {
@@ -8,7 +9,10 @@ namespace LethalSeedCracker2.src.config
         public string cmd = cmd;
         internal virtual void Parse(Config config, string[] args)
         {
-            Util.Assert(args.Length == numArgs, $"{cmd} expected {numArgs} arg, got {args.Length} ({this})");
+            if (numArgs != -1)
+            {
+                Util.Assert(args.Length == numArgs, $"{cmd} expected {numArgs} arg, got {args.Length} ({this})");
+            }
         }
     }
     internal abstract class ConfigCommand(string cmd
@@ -71,6 +75,26 @@ namespace LethalSeedCracker2.src.config
         public override string ToString()
         {
             return $"{cmd} <{name0}> <{name1}> <{name2}>";
+        }
+    }
+    internal abstract class ConfigCommandList<T0>(string cmd,
+        Func<Config, string, T0> parser0, string name0
+        ) : BaseConfigCommand(cmd, -1)
+    {
+        internal sealed override void Parse(Config config, string[] args)
+        {
+            base.Parse(config, args);
+            List<T0> arg0s = [];
+            for (int i = 1; i < args.Length; ++i)
+            {
+                arg0s.Add(parser0(config, args[i]));
+            }
+            Process(config, arg0s);
+        }
+        internal abstract void Process(Config config, List<T0> arg0);
+        public override string ToString()
+        {
+            return $"{cmd} <{name0}> ...";
         }
     }
 }

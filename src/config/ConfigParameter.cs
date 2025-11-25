@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LethalSeedCracker2.src.config
 {
@@ -27,6 +28,15 @@ namespace LethalSeedCracker2.src.config
         internal override void Process(Config config, T0 arg0, T1 arg1)
         {
             apply(config, arg0, arg1);
+        }
+    }
+    internal class ConfigParameterList<T0>(string cmd,
+        Func<Config, string, T0> parser0, string name0,
+        Action<Config, List<T0>> apply) : ConfigCommandList<T0>(cmd, parser0, name0)
+    {
+        internal override void Process(Config config, List<T0> arg0s)
+        {
+            apply(config, arg0s);
         }
     }
 }
