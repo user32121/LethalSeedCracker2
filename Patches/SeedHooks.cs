@@ -11,6 +11,8 @@ namespace LethalSeedCracker2.Patches
         [HarmonyPrefix]
         public static void SetSeed(StartOfRound __instance)
         {
+            BeeState.roamingBees.Clear();
+
             if (SeedCracker.config is null)
             {
                 LethalSeedCracker2.Logger.LogInfo("No config loaded; not setting parameters");
@@ -19,7 +21,7 @@ namespace LethalSeedCracker2.Patches
             if (SeedCracker.config.eclipsed)
             {
                 SeedCracker.config.currentLevel.currentWeather = LevelWeatherType.Eclipsed;
-                LethalSeedCracker2.Logger.LogInfo($"Cleared weather");
+                LethalSeedCracker2.Logger.LogInfo($"Eclipsed weather");
             }
             else
             {
