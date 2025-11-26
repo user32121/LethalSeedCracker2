@@ -9,7 +9,7 @@ namespace LethalSeedCracker2.Patches
         [HarmonyPrefix]
         private static void UpdatePrefix(StartMatchLever __instance)
         {
-            if (SeedCracker.config is null)
+            if (SeedCracker.config is null || SeedCracker.config.seeds.Count == 0)
             {
                 return;
             }

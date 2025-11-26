@@ -11,13 +11,18 @@ namespace LethalSeedCracker2.Patches
         [HarmonyPrefix]
         public static void SetSeed(StartOfRound __instance)
         {
-            BeeState.Reset();
-
             if (SeedCracker.config is null)
             {
                 LethalSeedCracker2.Logger.LogInfo("No config loaded; not setting parameters");
                 return;
             }
+            if (SeedCracker.config.seeds.Count == 0)
+            {
+                LethalSeedCracker2.Logger.LogInfo("No seeds");
+                return;
+            }
+
+            BeeState.Reset();
             if (SeedCracker.config.eclipsed)
             {
                 SeedCracker.config.currentLevel.currentWeather = LevelWeatherType.Eclipsed;
@@ -64,7 +69,7 @@ namespace LethalSeedCracker2.Patches
             ++SeedCracker.config.curSeedIdx;
             if (SeedCracker.config.curSeedIdx >= SeedCracker.config.seeds.Count)
             {
-                LethalSeedCracker2.Logger.LogInfo("Finished all seeds");
+                LethalSeedCracker2.Logger.LogInfo("Finished all seeds; nulling config");
                 SeedCracker.config = null;
             }
         }

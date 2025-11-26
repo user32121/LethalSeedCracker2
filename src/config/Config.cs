@@ -40,6 +40,25 @@ namespace LethalSeedCracker2.src.config
             new ConfigParameter<int>("seed", ParseInt, "seed", (config, seed) => config.seeds.Add(seed)),
             new ConfigParameterList<int>("seeds", ParseInt, "seed", (config, seeds) => config.seeds.AddRange(seeds)),
             new ConfigParameter<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
+            new ConfigParameter<string>("seedfile", (config, s) => s, "file", (config, filename) => {
+                string folderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "32121", "LethalSeedCracker");
+                string filepath = Path.Join(folderPath, filename);
+                using StreamReader file = new(File.OpenRead(filepath));
+                while (!file.EndOfStream) {
+                    string[] line = file.ReadLine().Trim().Split();
+                    if (line.Length == 0) {
+                        continue;
+                    }
+                    if (!line[0].StartsWith("seed")) {
+                        LethalSeedCracker2.Logger.LogInfo($"Skipping line: {string.Join(" ", line)}");
+                        continue;
+                    }
+                    for (int i = 1; i < line.Length; i++) {
+                        LethalSeedCracker2.Logger.LogInfo($"Adding seed {line[i]}");
+                        config.seeds.Add(int.Parse(line[i]));
+                    }
+                }
+            }),
             new ConfigParameter<int>("daystildeadline", ParseInt, "days", (config, days) => config.daysUntilDeadline = days),
             new ConfigParameter<int>("dayssurvived", ParseInt, "days", (config, days) => config.daysPlayersSurvivedInARow = days),
             new ConfigParameter<SelectableLevel>("moon", ParseMoon, "moon", (config, moon) => config.currentLevel = moon),
@@ -180,6 +199,11 @@ namespace LethalSeedCracker2.src.config
             {
                 PrintMoons();
                 throw new Exception("No moon set. Set the current moon using \"moon\" e.g. \"moon experimentation\"");
+            }
+            if (seeds.Count == 0)
+            {
+                PrintCommands();
+                throw new Exception("No seeds.");
             }
             LethalSeedCracker2.Logger.LogInfo("Successfully loaded config");
         }
