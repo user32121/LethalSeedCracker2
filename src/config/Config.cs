@@ -116,8 +116,9 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilter("blackout", (result, blackout) => !blackout || result.levelResult.blackout),
             new ConfigFilter<CompanyMood?>("companymood", ParseCompanyMood, null, "mood", (result, mood) => mood == null || mood == result.levelResult.currentCompanyMood),
             new ConfigFilter("indoorfog", (result, indoorfog) => !indoorfog || result.enemyResult.indoorFog),
-            new ConfigFilter<Func<float, float, bool>?, float>("closesttrap", ParseComparator, null, "comparator", ParseFloat, 0, "num", (result, op, num) => op == null || op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
+            new ConfigFilter<Func<float, float, bool>?, float>("closesttrap", ParseComparator, null, "comparator", ParseFloat, 0, "distance", (result, op, num) => op == null || (result.levelResult.nearestEntranceTraps.Count > 0 && op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num))),
             new ConfigFilter<Func<float, float, bool>?, int>("roamingbees", ParseComparator, null, "comparator", ParseInt, 0, "num", (result, op, num) => op == null || op(result.enemyResult.roamingBees, num)),
+            new ConfigFilter<Func<float, float, bool>?, float>("closestpumpkin", ParseComparator, null, "comparator", ParseFloat, 0, "distance", (result, op, num) => op == null || (result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num))),
         ];
 
         private static readonly Dictionary<string, Func<float, float, bool>> comparators = new()
@@ -417,15 +418,6 @@ namespace LethalSeedCracker2.src.config
             foreach (var item in TimeOfDay.Instance.CommonCompanyMoods)
             {
                 LethalSeedCracker2.Logger.LogInfo($"{item}: timeToWaitBeforeGrabbingItem: {item.timeToWaitBeforeGrabbingItem}, irritability: {item.irritability}, judgementSpeed: {item.judgementSpeed}, startingPatience: {item.startingPatience}, mustBeWokenUp: {item.mustBeWokenUp}, maximumItemsToAnger: {item.maximumItemsToAnger}, sensitivity: {item.sensitivity}, manifestation: {item.manifestation}");
-            }
-        }
-
-        private static void PrintTraps(Config config)
-        {
-            LethalSeedCracker2.Logger.LogInfo("Traps:");
-            foreach (var item in config.currentLevel.spawnableScrap)
-            {
-                LethalSeedCracker2.Logger.LogInfo($"{item.spawnableItem.name}, {item.spawnableItem.itemName}");
             }
         }
 

@@ -17,6 +17,7 @@ namespace LethalSeedCracker2.src.cracker
         internal Dictionary<TRAP, int> trapCounts = [];
         internal int numLockedDoors;
         internal Dictionary<string, int> outsideObjectCounts = [];
+        internal Dictionary<EntranceTeleport, float> nearestPumpkins = [];
         internal bool blackout;
         internal CompanyMood currentCompanyMood;
         internal int numMeteors;
@@ -91,6 +92,24 @@ namespace LethalSeedCracker2.src.cracker
                         {
                             int count = outsideObjectCounts.GetValueOrDefault(item2.spawnableObject.name);
                             outsideObjectCounts[item2.spawnableObject.name] = count + 1;
+
+                            if (item2.spawnableObject.name.ToLower().Contains("pumpkin"))
+                            {
+                                var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
+                                foreach (var entrance in entrances)
+                                {
+                                    if (!entrance.isEntranceToBuilding)
+                                    {
+                                        continue;
+                                    }
+                                    var best = nearestPumpkins.GetValueOrDefault(entrance, float.PositiveInfinity);
+                                    var dist = Vector3.Distance(item.transform.position, entrance.transform.position);
+                                    if (dist < best)
+                                    {
+                                        nearestPumpkins[entrance] = dist;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -102,7 +121,8 @@ namespace LethalSeedCracker2.src.cracker
             string trapList = string.Join(", ", [.. from item in trapCounts select $"{item.Key}: {item.Value}"]);
             string outsideObjectList = string.Join(", ", [.. from item in outsideObjectCounts select $"{item.Key}: {item.Value}"]);
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
-            return $"dungeon: {currentDungeonType}, num rooms: {numRooms}, locked doors: {numLockedDoors}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}, blackout: {blackout}, vents: {numVents}, company mood: {currentCompanyMood.name}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]";
+            string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
+            return $"dungeon: {currentDungeonType}, num rooms: {numRooms}, locked doors: {numLockedDoors}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}, blackout: {blackout}, vents: {numVents}, company mood: {currentCompanyMood.name}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]";
         }
     }
 }
