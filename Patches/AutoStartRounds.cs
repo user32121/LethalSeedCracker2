@@ -16,15 +16,14 @@ namespace LethalSeedCracker2.Patches
             if (__instance.playersManager.inShipPhase)
             {
                 LethalSeedCracker2.Logger.LogInfo("Auto starting round");
-                __instance.LeverAnimation();
-                __instance.PullLever();
+                __instance.PullLeverAnim(true);
+                __instance.StartGame();
             }
-            else if (SeedCracker.config.skipDay && __instance.leverHasBeenPulled && !__instance.playersManager.newGameIsLoading)
+            else if (SeedCracker.config.skipDay && !__instance.playersManager.shipIsLeaving && !__instance.playersManager.newGameIsLoading)
             {
                 LethalSeedCracker2.Logger.LogInfo("Early ending round");
-                __instance.playersManager.shipHasLanded = true;
-                __instance.LeverAnimation();
-                __instance.PullLever();
+                __instance.PullLeverAnim(false);
+                __instance.EndGame();
             }
         }
     }
