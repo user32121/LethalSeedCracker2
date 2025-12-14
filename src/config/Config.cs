@@ -21,6 +21,7 @@ namespace LethalSeedCracker2.src.config
         internal bool skipOutsideObjects;
         internal bool skipScrap;
         internal bool skipWeather;
+        internal bool skipDay;
 
         internal int foundSeeds = 0;
 
@@ -69,6 +70,7 @@ namespace LethalSeedCracker2.src.config
             new ConfigParameter("skipoutsideobjects", config => config.skipOutsideObjects = true),
             new ConfigParameter("skipscrap", config => config.skipScrap = true),
             new ConfigParameter("skipweather", config => config.skipWeather = true),
+            new ConfigParameter("skipday", config => config.skipDay = true),
 
             new ConfigFilter<Defines.DUNGEON>("dungeon", ParseEnum<Defines.DUNGEON>, Defines.DUNGEON.INVALID, "dungeon", (result, dungeon) => dungeon == Defines.DUNGEON.INVALID || dungeon == result.levelResult.currentDungeonType),
             new ConfigFilter<EnemyType?>("infestation", ParseEnemy, null, "enemy", (result, enemy) => enemy == null || enemy == result.enemyResult.infestation),
