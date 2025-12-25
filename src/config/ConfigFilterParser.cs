@@ -9,8 +9,8 @@ namespace LethalSeedCracker2.src.config
         internal bool Filter(CrackingResult result);
     }
 
-    internal class ConfigFilter(string cmd,
-        Func<CrackingResult, bool, bool> filter) : ConfigCommand(cmd), IConfigFilter
+    internal class ConfigFilterParser(string cmd,
+        Func<CrackingResult, bool, bool> filter) : ConfigCommandParser(cmd), IConfigFilter
     {
         protected bool active = false;
         internal override void Process(Config config)

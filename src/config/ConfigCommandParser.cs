@@ -15,7 +15,7 @@ namespace LethalSeedCracker2.src.config
             }
         }
     }
-    internal abstract class ConfigCommand(string cmd
+    internal abstract class ConfigCommandParser(string cmd
         ) : BaseConfigCommand(cmd, 0)
     {
         internal sealed override void Parse(Config config, string[] args)

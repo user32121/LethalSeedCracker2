@@ -63,18 +63,18 @@ namespace LethalSeedCracker2.src.config
             new ConfigParameter<int>("daystildeadline", ParseInt, "days", (config, days) => config.daysUntilDeadline = days),
             new ConfigParameter<int>("dayssurvived", ParseInt, "days", (config, days) => config.daysPlayersSurvivedInARow = days),
             new ConfigParameter<SelectableLevel>("moon", ParseMoon, "moon", (config, moon) => config.currentLevel = moon),
-            new ConfigParameter("eclipsed", config => config.eclipsed = true),
-            new ConfigParameter("ignorepower", config => config.ignorepower = true),
-            new ConfigParameter("skipenemies", config => config.skipEnemies = true),
-            new ConfigParameter("skiptraps", config => config.skipTraps = true),
-            new ConfigParameter("skipoutsideobjects", config => config.skipOutsideObjects = true),
-            new ConfigParameter("skipscrap", config => config.skipScrap = true),
-            new ConfigParameter("skipweather", config => config.skipWeather = true),
-            new ConfigParameter("skipday", config => config.skipDay = true),
+            new ConfigParameterParser("eclipsed", config => config.eclipsed = true),
+            new ConfigParameterParser("ignorepower", config => config.ignorepower = true),
+            new ConfigParameterParser("skipenemies", config => config.skipEnemies = true),
+            new ConfigParameterParser("skiptraps", config => config.skipTraps = true),
+            new ConfigParameterParser("skipoutsideobjects", config => config.skipOutsideObjects = true),
+            new ConfigParameterParser("skipscrap", config => config.skipScrap = true),
+            new ConfigParameterParser("skipweather", config => config.skipWeather = true),
+            new ConfigParameterParser("skipday", config => config.skipDay = true),
 
             new ConfigFilter<Defines.DUNGEON>("dungeon", ParseEnum<Defines.DUNGEON>, Defines.DUNGEON.INVALID, "dungeon", (result, dungeon) => dungeon == Defines.DUNGEON.INVALID || dungeon == result.levelResult.currentDungeonType),
             new ConfigFilter<EnemyType?>("infestation", ParseEnemy, null, "enemy", (result, enemy) => enemy == null || enemy == result.enemyResult.infestation),
-            new ConfigFilter("meteor", (result, meteor) => !meteor || result.levelResult.meteor),
+            new ConfigFilterParser("meteor", (result, meteor) => !meteor || result.levelResult.meteor),
             new ConfigFilters<LevelWeatherType, SelectableLevel>("weather", ParseEnum<LevelWeatherType>, "weather", ParseMoon, "moon", (result, weathers, moons) => {
                 for (int i = 0; i < weathers.Count; ++i) {
                     if (result.weatherResult.weathers.GetValueOrDefault(moons[i], LevelWeatherType.None) != weathers[i]) {
@@ -115,9 +115,9 @@ namespace LethalSeedCracker2.src.config
                 }
                 return true;
             }),
-            new ConfigFilter("blackout", (result, blackout) => !blackout || result.levelResult.blackout),
+            new ConfigFilterParser("blackout", (result, blackout) => !blackout || result.levelResult.blackout),
             new ConfigFilter<CompanyMood?>("companymood", ParseCompanyMood, null, "mood", (result, mood) => mood == null || mood == result.levelResult.currentCompanyMood),
-            new ConfigFilter("indoorfog", (result, indoorfog) => !indoorfog || result.enemyResult.indoorFog),
+            new ConfigFilterParser("indoorfog", (result, indoorfog) => !indoorfog || result.enemyResult.indoorFog),
             new ConfigFilter<Func<float, float, bool>?, float>("closesttrap", ParseComparator, null, "comparator", ParseFloat, 0, "distance", (result, op, num) => op == null || (result.levelResult.nearestEntranceTraps.Count > 0 && op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num))),
             new ConfigFilter<Func<float, float, bool>?, int>("roamingbees", ParseComparator, null, "comparator", ParseInt, 0, "num", (result, op, num) => op == null || op(result.enemyResult.roamingBees, num)),
             new ConfigFilter<Func<float, float, bool>?, float>("closestpumpkin", ParseComparator, null, "comparator", ParseFloat, 0, "distance", (result, op, num) => op == null || (result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num))),

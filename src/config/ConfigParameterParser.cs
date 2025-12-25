@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace LethalSeedCracker2.src.config
 {
-    internal class ConfigParameter(string cmd,
-        Action<Config> apply) : ConfigCommand(cmd)
+    internal class ConfigParameterParser(string cmd,
+        Action<Config> apply) : ConfigCommandParser(cmd)
     {
         internal override void Process(Config config)
         {
