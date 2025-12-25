@@ -1,0 +1,2 @@
+change internal to private
+change Func<float, float, bool> to comparator

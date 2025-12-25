@@ -11,28 +11,28 @@ namespace LethalSeedCracker2.src.config
             apply(config);
         }
     }
-    internal class ConfigParameter<T0>(string cmd,
+    internal class ConfigParameterParser<T0>(string cmd,
         Func<Config, string, T0> parser0, string name0,
-        Action<Config, T0> apply) : ConfigCommand<T0>(cmd, parser0, name0)
+        Action<Config, T0> apply) : ConfigCommandParser<T0>(cmd, parser0, name0)
     {
         internal override void Process(Config config, T0 arg0)
         {
             apply(config, arg0);
         }
     }
-    internal class ConfigParameter<T0, T1>(string cmd,
+    internal class ConfigParameterParser<T0, T1>(string cmd,
         Func<Config, string, T0> parser0, string name0,
         Func<Config, string, T1> parser1, string name1,
-        Action<Config, T0, T1> apply) : ConfigCommand<T0, T1>(cmd, parser0, name0, parser1, name1)
+        Action<Config, T0, T1> apply) : ConfigCommandParser<T0, T1>(cmd, parser0, name0, parser1, name1)
     {
         internal override void Process(Config config, T0 arg0, T1 arg1)
         {
             apply(config, arg0, arg1);
         }
     }
-    internal class ConfigParameterList<T0>(string cmd,
+    internal class ConfigParameterListParser<T0>(string cmd,
         Func<Config, string, T0> parser0, string name0,
-        Action<Config, List<T0>> apply) : ConfigCommandList<T0>(cmd, parser0, name0)
+        Action<Config, List<T0>> apply) : ConfigCommandListParser<T0>(cmd, parser0, name0)
     {
         internal override void Process(Config config, List<T0> arg0s)
         {

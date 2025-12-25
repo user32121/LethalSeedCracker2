@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace LethalSeedCracker2.src.config
 {
-    internal abstract class BaseConfigCommand(string cmd, int numArgs)
+    internal abstract class BaseConfigCommandParser(string cmd, int numArgs)
     {
         public string cmd = cmd;
         internal virtual void Parse(Config config, string[] args)
@@ -16,7 +16,7 @@ namespace LethalSeedCracker2.src.config
         }
     }
     internal abstract class ConfigCommandParser(string cmd
-        ) : BaseConfigCommand(cmd, 0)
+        ) : BaseConfigCommandParser(cmd, 0)
     {
         internal sealed override void Parse(Config config, string[] args)
         {
@@ -29,9 +29,9 @@ namespace LethalSeedCracker2.src.config
             return $"{cmd}";
         }
     }
-    internal abstract class ConfigCommand<T0>(string cmd,
+    internal abstract class ConfigCommandParser<T0>(string cmd,
         Func<Config, string, T0> parser0, string name0
-        ) : BaseConfigCommand(cmd, 1)
+        ) : BaseConfigCommandParser(cmd, 1)
     {
         internal sealed override void Parse(Config config, string[] args)
         {
@@ -44,10 +44,10 @@ namespace LethalSeedCracker2.src.config
             return $"{cmd} <{name0}>";
         }
     }
-    internal abstract class ConfigCommand<T0, T1>(string cmd,
+    internal abstract class ConfigCommandParser<T0, T1>(string cmd,
         Func<Config, string, T0> parser0, string name0,
         Func<Config, string, T1> parser1, string name1
-        ) : BaseConfigCommand(cmd, 2)
+        ) : BaseConfigCommandParser(cmd, 2)
     {
         internal sealed override void Parse(Config config, string[] args)
         {
@@ -60,11 +60,11 @@ namespace LethalSeedCracker2.src.config
             return $"{cmd} <{name0}> <{name1}>";
         }
     }
-    internal abstract class ConfigCommand<T0, T1, T2>(string cmd,
+    internal abstract class ConfigCommandParser<T0, T1, T2>(string cmd,
         Func<Config, string, T0> parser0, string name0,
         Func<Config, string, T1> parser1, string name1,
         Func<Config, string, T2> parser2, string name2
-        ) : BaseConfigCommand(cmd, 3)
+        ) : BaseConfigCommandParser(cmd, 3)
     {
         internal sealed override void Parse(Config config, string[] args)
         {
@@ -77,9 +77,9 @@ namespace LethalSeedCracker2.src.config
             return $"{cmd} <{name0}> <{name1}> <{name2}>";
         }
     }
-    internal abstract class ConfigCommandList<T0>(string cmd,
+    internal abstract class ConfigCommandListParser<T0>(string cmd,
         Func<Config, string, T0> parser0, string name0
-        ) : BaseConfigCommand(cmd, -1)
+        ) : BaseConfigCommandParser(cmd, -1)
     {
         internal sealed override void Parse(Config config, string[] args)
         {
