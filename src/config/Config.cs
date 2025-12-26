@@ -42,10 +42,10 @@ namespace LethalSeedCracker2.src.config
         private static readonly Func<Config, string, float> ParseFloat = (config, s) => float.Parse(s);
         private static readonly List<BaseConfigCommandParser> commands =
         [
-            new ConfigParameterParser<int>("seed", ParseInt, "seed", (config, seed) => config.seeds.Add(seed)),
-            new ConfigParameterListParser<int>("seeds", ParseInt, "seed", (config, seeds) => config.seeds.AddRange(seeds)),
-            new ConfigParameterParser<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
-            new ConfigParameterParser<string>("seedfile", (config, s) => s, "file", (config, filename) => {
+            new ConfigParameterParser<int>("seed", ParseInt, "seed", (config, stream, seed) => config.seeds.Add(seed)),
+            new ConfigParameterListParser<int>("seeds", ParseInt, "seed", (config, stream, seeds) => config.seeds.AddRange(seeds)),
+            new ConfigParameterParser<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, stream, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
+            new ConfigParameterParser<string>("seedfile", (config, s) => s, "file", (config, stream,filename) => {
                 string folderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "32121", "LethalSeedCracker");
                 string filepath = Path.Join(folderPath, filename);
                 using StreamReader file = new(File.OpenRead(filepath));
@@ -64,17 +64,17 @@ namespace LethalSeedCracker2.src.config
                     }
                 }
             }),
-            new ConfigParameterParser<int>("daystildeadline", ParseInt, "days", (config, days) => config.daysUntilDeadline = days),
-            new ConfigParameterParser<int>("dayssurvived", ParseInt, "days", (config, days) => config.daysPlayersSurvivedInARow = days),
-            new ConfigParameterParser<SelectableLevel>("moon", ParseMoon, "moon", (config, moon) => config.currentLevel = moon),
-            new ConfigParameterParser("eclipsed", config => config.eclipsed = true),
-            new ConfigParameterParser("ignorepower", config => config.ignorepower = true),
-            new ConfigParameterParser("skipenemies", config => config.skipEnemies = true),
-            new ConfigParameterParser("skiptraps", config => config.skipTraps = true),
-            new ConfigParameterParser("skipoutsideobjects", config => config.skipOutsideObjects = true),
-            new ConfigParameterParser("skipscrap", config => config.skipScrap = true),
-            new ConfigParameterParser("skipweather", config => config.skipWeather = true),
-            new ConfigParameterParser("skipday", config => config.skipDay = true),
+            new ConfigParameterParser<int>("daystildeadline", ParseInt, "days", (config, stream, days) => config.daysUntilDeadline = days),
+            new ConfigParameterParser<int>("dayssurvived", ParseInt, "days", (config, stream, days) => config.daysPlayersSurvivedInARow = days),
+            new ConfigParameterParser<SelectableLevel>("moon", ParseMoon, "moon", (config, stream, moon) => config.currentLevel = moon),
+            new ConfigParameterParser("eclipsed", (config, stream) => config.eclipsed = true),
+            new ConfigParameterParser("ignorepower", (config, stream) => config.ignorepower = true),
+            new ConfigParameterParser("skipenemies", (config, stream) => config.skipEnemies = true),
+            new ConfigParameterParser("skiptraps", (config, stream) => config.skipTraps = true),
+            new ConfigParameterParser("skipoutsideobjects", (config, stream) => config.skipOutsideObjects = true),
+            new ConfigParameterParser("skipscrap", (config, stream) => config.skipScrap = true),
+            new ConfigParameterParser("skipweather", (config, stream) => config.skipWeather = true),
+            new ConfigParameterParser("skipday", (config, stream) => config.skipDay = true),
 
             new ConfigFilterParser<Defines.DUNGEON>("dungeon", ParseEnum<Defines.DUNGEON>, "dungeon", (result, dungeon) => dungeon == result.levelResult.currentDungeonType),
             new ConfigFilterParser<EnemyType>("infestation", ParseEnemy, "enemy", (result, enemy) => enemy == result.enemyResult.infestation),
@@ -157,7 +157,7 @@ namespace LethalSeedCracker2.src.config
                     {
                         if (item.cmd == cmd)
                         {
-                            item.Parse(this, line[1..]);
+                            item.Parse(this, line[1..], file);
                             goto PARSED_COMMAND;
                         }
                     }
