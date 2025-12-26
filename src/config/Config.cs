@@ -26,7 +26,8 @@ namespace LethalSeedCracker2.src.config
         internal int foundSeeds = 0;
 
         internal readonly List<Predicate<CrackingResult>> filters = [];
-        private readonly List<Tuple<EnemyType, Func<float, float, bool>, int>> enemyConstraints = [];
+        private delegate bool Comparator(float arg1, float arg2);
+        private readonly List<Tuple<EnemyType, Comparator, int>> enemyConstraints = [];
 
         //convenience name mappings
         private static readonly Dictionary<string, string> colloquialNames = new()
@@ -79,19 +80,19 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilterParser<EnemyType>("infestation", ParseEnemy, "enemy", (result, enemy) => enemy == result.enemyResult.infestation),
             new ConfigFilterParser("meteor", result => result.levelResult.meteor),
             new ConfigFilterParser<LevelWeatherType, SelectableLevel>("weather", ParseEnum<LevelWeatherType>, "weather", ParseMoon, "moon", (result, weather, moon) => result.weatherResult.weathers.GetValueOrDefault(moon, LevelWeatherType.None) == weather),
-            new ConfigFilterParser<EnemyType, Func<float, float, bool>, int>("enemy", ParseEnemy, "enemy", ParseComparator, "comparator", ParseInt, "num", (result, enemy, op, num) => op(result.enemyResult.enemyCounts.GetValueOrDefault(enemy), num), CheckEnemyPower),
-            new ConfigFilterParser<Item, Func<float, float, bool>, int>("scrap", ParseScrap, "scrap", ParseComparator, "comparator", ParseInt, "num", (result, scrap, op, num) => op(result.scrapResult.scrapCounts.GetValueOrDefault(scrap), num)),
-            new ConfigFilterParser<Defines.TRAP, Func<float, float, bool>, int>("trap", ParseEnum<Defines.TRAP>, "trap", ParseComparator, "comparator", ParseInt, "num", (result, trap, op, num) => op(result.levelResult.trapCounts.GetValueOrDefault(trap), num)),
-            new ConfigFilterParser<string, Func<float, float, bool>, int>("outsideobject", ParseOutsideObject, "object", ParseComparator, "comparator", ParseInt, "num", (result, obj, op, num) => op(result.levelResult.outsideObjectCounts.GetValueOrDefault(obj), num)),
+            new ConfigFilterParser<EnemyType, Comparator, int>("enemy", ParseEnemy, "enemy", ParseComparator, "comparator", ParseInt, "num", (result, enemy, op, num) => op(result.enemyResult.enemyCounts.GetValueOrDefault(enemy), num), CheckEnemyPower),
+            new ConfigFilterParser<Item, Comparator, int>("scrap", ParseScrap, "scrap", ParseComparator, "comparator", ParseInt, "num", (result, scrap, op, num) => op(result.scrapResult.scrapCounts.GetValueOrDefault(scrap), num)),
+            new ConfigFilterParser<Defines.TRAP, Comparator, int>("trap", ParseEnum<Defines.TRAP>, "trap", ParseComparator, "comparator", ParseInt, "num", (result, trap, op, num) => op(result.levelResult.trapCounts.GetValueOrDefault(trap), num)),
+            new ConfigFilterParser<string, Comparator, int>("outsideobject", ParseOutsideObject, "object", ParseComparator, "comparator", ParseInt, "num", (result, obj, op, num) => op(result.levelResult.outsideObjectCounts.GetValueOrDefault(obj), num)),
             new ConfigFilterParser("blackout", (result) => result.levelResult.blackout),
             new ConfigFilterParser<CompanyMood>("companymood", ParseCompanyMood, "mood", (result, mood) => mood == null || mood == result.levelResult.currentCompanyMood),
             new ConfigFilterParser("indoorfog", (result) => result.enemyResult.indoorFog),
-            new ConfigFilterParser<Func<float, float, bool>, float>("closesttrap", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestEntranceTraps.Count > 0 && op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
-            new ConfigFilterParser<Func<float, float, bool>, int>("roamingbees", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.enemyResult.roamingBees, num)),
-            new ConfigFilterParser<Func<float, float, bool>, float>("closestpumpkin", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num)),
+            new ConfigFilterParser<Comparator, float>("closesttrap", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestEntranceTraps.Count > 0 && op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
+            new ConfigFilterParser<Comparator, int>("roamingbees", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.enemyResult.roamingBees, num)),
+            new ConfigFilterParser<Comparator, float>("closestpumpkin", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num)),
         ];
 
-        private static readonly Dictionary<string, Func<float, float, bool>> comparators = new()
+        private static readonly Dictionary<string, Comparator> comparators = new()
         {
             [">"] = (x, y) => x > y,
             ["<"] = (x, y) => x < y,
@@ -252,7 +253,7 @@ namespace LethalSeedCracker2.src.config
             throw new Exception($"Unrecognized scrap: {name}");
         }
 
-        private static Func<float, float, bool> ParseComparator(Config _, string op)
+        private static Comparator ParseComparator(Config _, string op)
         {
             if (!comparators.ContainsKey(op))
             {
@@ -434,7 +435,7 @@ namespace LethalSeedCracker2.src.config
             }
         }
 
-        private static void CheckEnemyPower(Config config, EnemyType enemy, Func<float, float, bool> op, int num)
+        private static void CheckEnemyPower(Config config, EnemyType enemy, Comparator op, int num)
         {
             config.enemyConstraints.Add(new(enemy, op, num));
 
