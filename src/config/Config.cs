@@ -25,7 +25,7 @@ namespace LethalSeedCracker2.src.config
 
         internal int foundSeeds = 0;
 
-        internal readonly List<Predicate<CrackingResult>> filters = [];
+        private readonly List<Predicate<CrackingResult>> filters = [];
         private delegate bool Comparator(float arg1, float arg2);
         private readonly List<Tuple<EnemyType, Comparator, int>> enemyConstraints = [];
 
@@ -42,10 +42,10 @@ namespace LethalSeedCracker2.src.config
         private static readonly Func<Config, string, float> ParseFloat = (config, s) => float.Parse(s);
         private static readonly List<BaseConfigCommandParser> commands =
         [
-            new ConfigParameterParser<int>("seed", ParseInt, "seed", (config, stream, seed) => config.seeds.Add(seed)),
-            new ConfigParameterListParser<int>("seeds", ParseInt, "seed", (config, stream, seeds) => config.seeds.AddRange(seeds)),
-            new ConfigParameterParser<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, stream, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
-            new ConfigParameterParser<string>("seedfile", (config, s) => s, "file", (config, stream,filename) => {
+            new ConfigParameterParser<int>("seed", ParseInt, "seed", (config, seed) => config.seeds.Add(seed)),
+            new ConfigParameterListParser<int>("seeds", ParseInt, "seed", (config, seeds) => config.seeds.AddRange(seeds)),
+            new ConfigParameterParser<int, int>("seedrange", ParseInt, "min", ParseInt, "max", (config, min, max) => config.seeds.AddRange(Enumerable.Range(min, max - min + 1))),
+            new ConfigParameterParser<string>("seedfile", (config, s) => s, "file", (config,filename) => {
                 string folderPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "32121", "LethalSeedCracker");
                 string filepath = Path.Join(folderPath, filename);
                 using StreamReader file = new(File.OpenRead(filepath));
@@ -64,17 +64,17 @@ namespace LethalSeedCracker2.src.config
                     }
                 }
             }),
-            new ConfigParameterParser<int>("daystildeadline", ParseInt, "days", (config, stream, days) => config.daysUntilDeadline = days),
-            new ConfigParameterParser<int>("dayssurvived", ParseInt, "days", (config, stream, days) => config.daysPlayersSurvivedInARow = days),
-            new ConfigParameterParser<SelectableLevel>("moon", ParseMoon, "moon", (config, stream, moon) => config.currentLevel = moon),
-            new ConfigParameterParser("eclipsed", (config, stream) => config.eclipsed = true),
-            new ConfigParameterParser("ignorepower", (config, stream) => config.ignorepower = true),
-            new ConfigParameterParser("skipenemies", (config, stream) => config.skipEnemies = true),
-            new ConfigParameterParser("skiptraps", (config, stream) => config.skipTraps = true),
-            new ConfigParameterParser("skipoutsideobjects", (config, stream) => config.skipOutsideObjects = true),
-            new ConfigParameterParser("skipscrap", (config, stream) => config.skipScrap = true),
-            new ConfigParameterParser("skipweather", (config, stream) => config.skipWeather = true),
-            new ConfigParameterParser("skipday", (config, stream) => config.skipDay = true),
+            new ConfigParameterParser<int>("daystildeadline", ParseInt, "days", (config, days) => config.daysUntilDeadline = days),
+            new ConfigParameterParser<int>("dayssurvived", ParseInt, "days", (config, days) => config.daysPlayersSurvivedInARow = days),
+            new ConfigParameterParser<SelectableLevel>("moon", ParseMoon, "moon", (config, moon) => config.currentLevel = moon),
+            new ConfigParameterParser("eclipsed", config => config.eclipsed = true),
+            new ConfigParameterParser("ignorepower", config => config.ignorepower = true),
+            new ConfigParameterParser("skipenemies", config => config.skipEnemies = true),
+            new ConfigParameterParser("skiptraps", config => config.skipTraps = true),
+            new ConfigParameterParser("skipoutsideobjects", config => config.skipOutsideObjects = true),
+            new ConfigParameterParser("skipscrap", config => config.skipScrap = true),
+            new ConfigParameterParser("skipweather", config => config.skipWeather = true),
+            new ConfigParameterParser("skipday", config => config.skipDay = true),
 
             new ConfigFilterParser<Defines.DUNGEON>("dungeon", ParseEnum<Defines.DUNGEON>, "dungeon", (result, dungeon) => dungeon == result.levelResult.currentDungeonType),
             new ConfigFilterParser<EnemyType>("infestation", ParseEnemy, "enemy", (result, enemy) => enemy == result.enemyResult.infestation),
@@ -84,12 +84,46 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilterParser<Item, Comparator, int>("scrap", ParseScrap, "scrap", ParseComparator, "comparator", ParseInt, "num", (result, scrap, op, num) => op(result.scrapResult.scrapCounts.GetValueOrDefault(scrap), num)),
             new ConfigFilterParser<Defines.TRAP, Comparator, int>("trap", ParseEnum<Defines.TRAP>, "trap", ParseComparator, "comparator", ParseInt, "num", (result, trap, op, num) => op(result.levelResult.trapCounts.GetValueOrDefault(trap), num)),
             new ConfigFilterParser<string, Comparator, int>("outsideobject", ParseOutsideObject, "object", ParseComparator, "comparator", ParseInt, "num", (result, obj, op, num) => op(result.levelResult.outsideObjectCounts.GetValueOrDefault(obj), num)),
-            new ConfigFilterParser("blackout", (result) => result.levelResult.blackout),
+            new ConfigFilterParser("blackout", result => result.levelResult.blackout),
             new ConfigFilterParser<CompanyMood>("companymood", ParseCompanyMood, "mood", (result, mood) => mood == null || mood == result.levelResult.currentCompanyMood),
-            new ConfigFilterParser("indoorfog", (result) => result.enemyResult.indoorFog),
+            new ConfigFilterParser("indoorfog", result => result.enemyResult.indoorFog),
             new ConfigFilterParser<Comparator, float>("closesttrap", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestEntranceTraps.Count > 0 && op(result.levelResult.nearestEntranceTraps.Min(x => x.Value.Item2), num)),
             new ConfigFilterParser<Comparator, int>("roamingbees", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.enemyResult.roamingBees, num)),
             new ConfigFilterParser<Comparator, float>("closestpumpkin", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num)),
+
+            new ConfigMetaFilterParser("[", (config, stream) => {
+                List<Predicate<CrackingResult>> filters1 = [];
+                List<Predicate<CrackingResult>> filters2 = [];
+                while (true) {
+                    BaseConfigCommandParser? cmd = ParseCommand(config, filters1.Add, stream) ?? throw new Exception("Expected \"]or(\" line");
+                    if (cmd.cmd == "]or(") {
+                        break;
+                    }
+                }
+                while (true) {
+                    BaseConfigCommandParser? cmd = ParseCommand(config, filters2.Add, stream) ?? throw new Exception("Expected \")\" line");
+                    if (cmd.cmd == ")") {
+                        break;
+                    }
+                }
+                return result => {
+                    foreach (var filter in filters1) {
+                        if (!filter(result)) {
+                            goto FILTER2;
+                        }
+                    }
+                    return true;
+                FILTER2:
+                    foreach (var filter in filters2) {
+                        if (!filter(result)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+            }, "[asd\n<filters>\n]or(\n<filters>\n)"),
+            new ConfigMarkerParser("]or("),
+            new ConfigMarkerParser(")"),
         ];
 
         private static readonly Dictionary<string, Comparator> comparators = new()
@@ -135,35 +169,7 @@ namespace LethalSeedCracker2.src.config
                 using StreamReader file = new(File.OpenRead(filePath));
                 while (!file.EndOfStream)
                 {
-                    string[] line = file.ReadLine().Split('#')[0].Trim().Split();
-                    if (line.Length == 0 || line.Length == 1 && line[0].Length == 0)
-                    {
-                        continue;
-                    }
-                    for (int i = 0; i < line.Length; ++i)
-                    {
-                        foreach (var item in colloquialNames)
-                        {
-                            if (IContains(item.Key, line[i]))
-                            {
-                                LethalSeedCracker2.Logger.LogInfo($"Substituting {line[i]} to {item.Value}");
-                                line[i] = item.Value;
-                            }
-                        }
-                    }
-                    LethalSeedCracker2.Logger.LogInfo($"Processing line: {string.Join(" ", line)}");
-                    string cmd = line[0].ToLower();
-                    foreach (var item in commands)
-                    {
-                        if (item.cmd == cmd)
-                        {
-                            item.Parse(this, line[1..], file);
-                            goto PARSED_COMMAND;
-                        }
-                    }
-                    PrintCommands();
-                    throw new Exception($"unknown command: {line[0]}");
-                PARSED_COMMAND:;
+                    ParseCommand(this, filters.Add, file);
                 }
             }
 
@@ -178,6 +184,43 @@ namespace LethalSeedCracker2.src.config
                 throw new Exception("No seeds.");
             }
             LethalSeedCracker2.Logger.LogInfo("Successfully loaded config");
+        }
+
+        private static BaseConfigCommandParser? ParseCommand(Config config, Action<Predicate<CrackingResult>> filters, TextReader stream)
+        {
+        LOOP:
+            string[]? line = stream.ReadLine()?.Split('#')[0].Trim().Split();
+            if (line is null)
+            {
+                return null;
+            }
+            if (line.Length == 0 || line.Length == 1 && line[0].Length == 0)
+            {
+                goto LOOP;
+            }
+            for (int i = 0; i < line.Length; ++i)
+            {
+                foreach (var item in colloquialNames)
+                {
+                    if (IContains(item.Key, line[i]))
+                    {
+                        LethalSeedCracker2.Logger.LogInfo($"Substituting {line[i]} to {item.Value}");
+                        line[i] = item.Value;
+                    }
+                }
+            }
+            LethalSeedCracker2.Logger.LogInfo($"Processing line: {string.Join(" ", line)}");
+            string cmd = line[0].ToLower();
+            foreach (var item in commands)
+            {
+                if (item.cmd == cmd)
+                {
+                    item.Parse(config, filters, stream, line[1..]);
+                    return item;
+                }
+            }
+            PrintCommands();
+            throw new Exception($"unknown command: {line[0]}");
         }
 
         internal bool Filter(CrackingResult result)
@@ -310,7 +353,7 @@ namespace LethalSeedCracker2.src.config
             throw new Exception($"Unrecognized trap: {name}");
         }
 
-        private void PrintCommands()
+        private static void PrintCommands()
         {
             LethalSeedCracker2.Logger.LogInfo("Commands:");
             foreach (var item in commands)
