@@ -15,6 +15,7 @@ namespace LethalSeedCracker2.src.cracker
         internal bool meteor;
         internal float meteorShowerAtTime;
         internal Dictionary<TRAP, int> trapCounts = [];
+        internal int numDoors;
         internal int numLockedDoors;
         internal Dictionary<string, int> outsideObjectCounts = [];
         internal Dictionary<EntranceTeleport, float> nearestPumpkins = [];
@@ -38,7 +39,16 @@ namespace LethalSeedCracker2.src.cracker
             };
             numRooms = RoundManager.Instance.dungeonGenerator?.Generator.GenerationStats.TotalRoomCount ?? 0;
             meteor = TimeOfDay.Instance.MeteorWeather.meteorsEnabled;
-            numLockedDoors = UnityEngine.Object.FindObjectsOfType<DoorLock>().Length;
+            numDoors = 0;
+            numLockedDoors = 0;
+            foreach (var doorLock in UnityEngine.Object.FindObjectsOfType<DoorLock>())
+            {
+                ++numDoors;
+                if (doorLock.isLocked)
+                {
+                    ++numLockedDoors;
+                }
+            }
             meteorShowerAtTime = TimeOfDayPatch.meteorShowerAtTime;
             blackout = !UnityEngine.Object.FindObjectOfType<BreakerBox>()?.isPowerOn ?? false;
             currentCompanyMood = TimeOfDay.Instance.currentCompanyMood;
@@ -122,7 +132,7 @@ namespace LethalSeedCracker2.src.cracker
             string outsideObjectList = string.Join(", ", [.. from item in outsideObjectCounts select $"{item.Key}: {item.Value}"]);
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
             string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
-            return $"dungeon: {currentDungeonType}, num rooms: {numRooms}, locked doors: {numLockedDoors}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}, blackout: {blackout}, vents: {numVents}, company mood: {currentCompanyMood.name}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]";
+            return $"dungeon: {currentDungeonType}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}, blackout: {blackout}, vents: {numVents}, company mood: {currentCompanyMood.name}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]";
         }
     }
 }
