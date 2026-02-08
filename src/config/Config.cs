@@ -95,6 +95,15 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilterParser<Comparator, int>("valves", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numValves, num)),
             new ConfigFilterParser<Comparator, int>("burstvalves", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numBurstValves, num)),
             new ConfigFilterParser<Comparator, float>("highestroom", ParseComparator, "comparator", ParseFloat, "y", (result, op, num) => op(result.levelResult.highestRoom, num)),
+            new ConfigFilterParser<Comparator, float>("nearestroomtomain", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => op(result.levelResult.nearestRoomToMain, num)),
+            new ConfigFilterParser<Comparator, float>("distancebetweenentrances", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => { foreach (var item in result.levelResult.distanceBetweenEntrances)
+                {
+                    if(!op(item.Value, num)) {
+                        return false;
+                    }
+                }
+                return true;
+            }),
 
             new ConfigMetaFilterParser("[", (config, stream) => {
                 List<Predicate<CrackingResult>> filters1 = [];

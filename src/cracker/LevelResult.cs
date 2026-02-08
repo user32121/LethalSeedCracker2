@@ -28,6 +28,8 @@ namespace LethalSeedCracker2.src.cracker
         internal int numValves;
         internal int numBurstValves;
         internal float highestRoom;
+        internal float nearestRoomToMain;
+        internal Dictionary<Tuple<EntranceTeleport, EntranceTeleport>, float> distanceBetweenEntrances = [];
 
         public LevelResult(Config config)
         {
@@ -67,6 +69,24 @@ namespace LethalSeedCracker2.src.cracker
                 }
             }
             highestRoom = UnityEngine.Object.FindObjectsOfType<Tile>().Select(x => x.transform.position.y).Max();
+            var main = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>().Where(x => !x.isEntranceToBuilding && x.gameObject.name.Contains("EntranceTeleportA")).First();
+            nearestRoomToMain = UnityEngine.Object.FindObjectsOfType<Tile>().Select(x => (x.transform.position - main.entrancePoint.position).magnitude).Min();
+
+            var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
+            var insideEntrances = entrances.Where(x => !x.isEntranceToBuilding);
+            var outsideEntrances = entrances.Where(x => x.isEntranceToBuilding);
+
+            foreach (var e1 in insideEntrances)
+            {
+                foreach (var e2 in insideEntrances)
+                {
+                    if (e1 == e2)
+                    {
+                        break;
+                    }
+                    distanceBetweenEntrances[new(e1, e2)] = (e1.entrancePoint.position - e2.entrancePoint.position).magnitude;
+                }
+            }
 
             if (!config.skipTraps)
             {
@@ -85,14 +105,9 @@ namespace LethalSeedCracker2.src.cracker
                 {
                     trapCounts[TRAP.SPIKETRAP] = spikes.Length;
                 }
-                var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
                 var traps = mines.OfType<Component>().Concat(turrets).Concat(spikes);
-                foreach (var entrance in entrances)
+                foreach (var entrance in insideEntrances)
                 {
-                    if (entrance.isEntranceToBuilding)
-                    {
-                        continue;
-                    }
                     foreach (var trap in traps)
                     {
                         var best = nearestEntranceTraps.GetValueOrDefault(entrance, new(trap, float.PositiveInfinity));
@@ -118,13 +133,8 @@ namespace LethalSeedCracker2.src.cracker
 
                             if (item2.spawnableObject.name.ToLower().Contains("pumpkin"))
                             {
-                                var entrances = UnityEngine.Object.FindObjectsOfType<EntranceTeleport>();
-                                foreach (var entrance in entrances)
+                                foreach (var entrance in outsideEntrances)
                                 {
-                                    if (!entrance.isEntranceToBuilding)
-                                    {
-                                        continue;
-                                    }
                                     var best = nearestPumpkins.GetValueOrDefault(entrance, float.PositiveInfinity);
                                     var dist = Vector3.Distance(item.transform.position, entrance.transform.position);
                                     if (dist < best)
@@ -145,7 +155,8 @@ namespace LethalSeedCracker2.src.cracker
             string outsideObjectList = string.Join(", ", [.. from item in outsideObjectCounts select $"{item.Key}: {item.Value}"]);
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
             string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
-            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}, highestroom: {highestRoom}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]";
+            string entranceDistanceList = string.Join(", ", [.. from item in distanceBetweenEntrances select $"({item.Key.Item1.name}, {item.Key.Item2.name}): {item.Value}"]);
+            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]";
         }
     }
 }
