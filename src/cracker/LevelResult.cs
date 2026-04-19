@@ -30,6 +30,7 @@ namespace LethalSeedCracker2.src.cracker
         internal float highestRoom;
         internal float nearestRoomToMain;
         internal Dictionary<Tuple<EntranceTeleport, EntranceTeleport>, float> distanceBetweenEntrances = [];
+        internal Dictionary<EntranceTeleport, float> closestHawkNest = [];
 
         public LevelResult(Config config)
         {
@@ -146,6 +147,21 @@ namespace LethalSeedCracker2.src.cracker
                         }
                     }
                 }
+
+                foreach (var item in UnityEngine.Object.FindObjectsOfType<EnemyAINestSpawnObject>())
+                {
+                    if (item.enemyType.name.Contains("BaboonHawk"))
+                    {
+                        foreach (var entrance in outsideEntrances)
+                        {
+                            var dist = (item.transform.position - entrance.entrancePoint.position).magnitude;
+                            if (!closestHawkNest.ContainsKey(entrance) || closestHawkNest[entrance] < dist)
+                            {
+                                closestHawkNest[entrance] = dist;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -156,7 +172,8 @@ namespace LethalSeedCracker2.src.cracker
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
             string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
             string entranceDistanceList = string.Join(", ", [.. from item in distanceBetweenEntrances select $"({item.Key.Item1.name}, {item.Key.Item2.name}): {item.Value}"]);
-            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]";
+            string closestHawkNestList = string.Join(", ", [.. from item in closestHawkNest select $"{item.Key.name}: {item.Value}"]);
+            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]\n  closesthawknest: [{closestHawkNestList}]";
         }
     }
 }

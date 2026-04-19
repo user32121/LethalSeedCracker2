@@ -104,6 +104,7 @@ namespace LethalSeedCracker2.src.config
                 }
                 return true;
             }),
+            new ConfigFilterParser<Comparator, float>("closesthawknest", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.closestHawkNest.Count > 0 && op(result.levelResult.closestHawkNest.Min(x => x.Value), num)),
 
             new ConfigMetaFilterParser("[", (config, stream) => {
                 List<Predicate<CrackingResult>> filters1 = [];
