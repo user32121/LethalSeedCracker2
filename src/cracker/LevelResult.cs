@@ -18,6 +18,7 @@ namespace LethalSeedCracker2.src.cracker
         internal Dictionary<TRAP, int> trapCounts = [];
         internal int numDoors;
         internal int numLockedDoors;
+        internal int numLockedBigDoors;
         internal Dictionary<string, int> outsideObjectCounts = [];
         internal Dictionary<EntranceTeleport, float> nearestPumpkins = [];
         internal bool blackout;
@@ -30,7 +31,7 @@ namespace LethalSeedCracker2.src.cracker
         internal float highestRoom;
         internal float nearestRoomToMain;
         internal Dictionary<Tuple<EntranceTeleport, EntranceTeleport>, float> distanceBetweenEntrances = [];
-        internal Dictionary<EntranceTeleport, float> closestHawkNest = [];
+        internal Dictionary<EnemyType, Dictionary<EntranceTeleport, float>> closestNests = [];
 
         public LevelResult(Config config)
         {
@@ -54,6 +55,14 @@ namespace LethalSeedCracker2.src.cracker
                 if (doorLock.isLocked)
                 {
                     ++numLockedDoors;
+                }
+            }
+            numLockedBigDoors = 0;
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<TerminalAccessibleObject>())
+            {
+                if (item.isBigDoor && !item.isDoorOpen)
+                {
+                    ++numLockedBigDoors;
                 }
             }
             meteorShowerAtTime = TimeOfDayPatch.meteorShowerAtTime;
@@ -150,15 +159,16 @@ namespace LethalSeedCracker2.src.cracker
 
                 foreach (var item in UnityEngine.Object.FindObjectsOfType<EnemyAINestSpawnObject>())
                 {
-                    if (item.enemyType.name.Contains("BaboonHawk"))
+                    if (!closestNests.ContainsKey(item.enemyType))
                     {
-                        foreach (var entrance in outsideEntrances)
+                        closestNests[item.enemyType] = [];
+                    }
+                    foreach (var entrance in outsideEntrances)
+                    {
+                        var dist = (item.transform.position - entrance.entrancePoint.position).magnitude;
+                        if (!closestNests[item.enemyType].ContainsKey(entrance) || closestNests[item.enemyType][entrance] < dist)
                         {
-                            var dist = (item.transform.position - entrance.entrancePoint.position).magnitude;
-                            if (!closestHawkNest.ContainsKey(entrance) || closestHawkNest[entrance] < dist)
-                            {
-                                closestHawkNest[entrance] = dist;
-                            }
+                            closestNests[item.enemyType][entrance] = dist;
                         }
                     }
                 }
@@ -172,8 +182,8 @@ namespace LethalSeedCracker2.src.cracker
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
             string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
             string entranceDistanceList = string.Join(", ", [.. from item in distanceBetweenEntrances select $"({item.Key.Item1.name}, {item.Key.Item2.name}): {item.Value}"]);
-            string closestHawkNestList = string.Join(", ", [.. from item in closestHawkNest select $"{item.Key.name}: {item.Value}"]);
-            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]\n  closesthawknest: [{closestHawkNestList}]";
+            string closestNestList = string.Join(", ", [.. from item in closestNests select $"{item.Key.name}: [{string.Join(", ", [.. from item2 in item.Value select $"{item2.Key.name}: {item2.Value}"])}]"]);
+            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, locked powered doors: {numLockedBigDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]\n  closestnest: [{closestNestList}]";
         }
     }
 }

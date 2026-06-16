@@ -92,6 +92,7 @@ namespace LethalSeedCracker2.src.config
             new ConfigFilterParser<Comparator, float>("closestpumpkin", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.nearestPumpkins.Count > 0 && op(result.levelResult.nearestPumpkins.Min(x => x.Value), num)),
             new ConfigFilterParser<Comparator, int>("doors", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numDoors, num)),
             new ConfigFilterParser<Comparator, int>("lockeddoors", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numLockedDoors, num)),
+            new ConfigFilterParser<Comparator, int>("lockedpowereddoors", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numLockedBigDoors, num)),
             new ConfigFilterParser<Comparator, int>("valves", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numValves, num)),
             new ConfigFilterParser<Comparator, int>("burstvalves", ParseComparator, "comparator", ParseInt, "num", (result, op, num) => op(result.levelResult.numBurstValves, num)),
             new ConfigFilterParser<Comparator, float>("highestroom", ParseComparator, "comparator", ParseFloat, "y", (result, op, num) => op(result.levelResult.highestRoom, num)),
@@ -104,7 +105,7 @@ namespace LethalSeedCracker2.src.config
                 }
                 return true;
             }),
-            new ConfigFilterParser<Comparator, float>("closesthawknest", ParseComparator, "comparator", ParseFloat, "distance", (result, op, num) => result.levelResult.closestHawkNest.Count > 0 && op(result.levelResult.closestHawkNest.Min(x => x.Value), num)),
+            new ConfigFilterParser<EnemyType, Comparator, float>("closestnest", ParseEnemy, "enemy", ParseComparator, "comparator", ParseFloat, "distance", (result, enemy, op, num) => result.levelResult.closestNests.ContainsKey(enemy) && op(result.levelResult.closestNests[enemy].Min(x => x.Value), num)),
 
             new ConfigMetaFilterParser("[", (config, stream) => {
                 List<Predicate<CrackingResult>> filters1 = [];
