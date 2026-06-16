@@ -31,7 +31,8 @@ namespace LethalSeedCracker2.src.cracker
         internal float highestRoom;
         internal float nearestRoomToMain;
         internal Dictionary<Tuple<EntranceTeleport, EntranceTeleport>, float> distanceBetweenEntrances = [];
-        internal Dictionary<EnemyType, Dictionary<EntranceTeleport, float>> closestNests = [];
+        internal Dictionary<EnemyType, Dictionary<EntranceTeleport, float>> closestNestToEntrance = [];
+        internal Dictionary<EnemyType, float> closestNestToShip = [];
 
         public LevelResult(Config config)
         {
@@ -159,16 +160,25 @@ namespace LethalSeedCracker2.src.cracker
 
                 foreach (var item in UnityEngine.Object.FindObjectsOfType<EnemyAINestSpawnObject>())
                 {
-                    if (!closestNests.ContainsKey(item.enemyType))
+                    if (!closestNestToEntrance.ContainsKey(item.enemyType))
                     {
-                        closestNests[item.enemyType] = [];
+                        closestNestToEntrance[item.enemyType] = [];
                     }
                     foreach (var entrance in outsideEntrances)
                     {
                         var dist = (item.transform.position - entrance.entrancePoint.position).magnitude;
-                        if (!closestNests[item.enemyType].ContainsKey(entrance) || closestNests[item.enemyType][entrance] < dist)
+                        if (!closestNestToEntrance[item.enemyType].ContainsKey(entrance) || closestNestToEntrance[item.enemyType][entrance] < dist)
                         {
-                            closestNests[item.enemyType][entrance] = dist;
+                            closestNestToEntrance[item.enemyType][entrance] = dist;
+                        }
+                    }
+
+                    foreach (var pos in StartOfRound.Instance.playerSpawnPositions)
+                    {
+                        var dist = (item.transform.position - pos.position).magnitude;
+                        if (!closestNestToShip.ContainsKey(item.enemyType) || closestNestToShip[item.enemyType] < dist)
+                        {
+                            closestNestToShip[item.enemyType] = dist;
                         }
                     }
                 }
@@ -182,8 +192,9 @@ namespace LethalSeedCracker2.src.cracker
             string nearestTrapList = string.Join(", ", [.. from item in nearestEntranceTraps select $"{item.Key.gameObject.name}: {item.Value.Item1.GetType().Name}: {item.Value.Item2}"]);
             string nearestPumpkinList = string.Join(", ", [.. from item in nearestPumpkins select $"{item.Key.gameObject.name}: {item.Value}"]);
             string entranceDistanceList = string.Join(", ", [.. from item in distanceBetweenEntrances select $"({item.Key.Item1.name}, {item.Key.Item2.name}): {item.Value}"]);
-            string closestNestList = string.Join(", ", [.. from item in closestNests select $"{item.Key.name}: [{string.Join(", ", [.. from item2 in item.Value select $"{item2.Key.name}: {item2.Value}"])}]"]);
-            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, locked powered doors: {numLockedBigDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]\n  closestnest: [{closestNestList}]";
+            string closestNestEntranceList = string.Join(", ", [.. from item in closestNestToEntrance select $"{item.Key.name}: [{string.Join(", ", [.. from item2 in item.Value select $"{item2.Key.name}: {item2.Value}"])}]"]);
+            string closestNestShipList = string.Join(", ", [.. from item in closestNestToShip select $"{item.Key.name}: {item.Value}"]);
+            return $"dungeon: {currentDungeonType}, blackout: {blackout}, vents: {numVents}, num rooms: {numRooms}, doors: {numDoors}, locked doors: {numLockedDoors}, locked powered doors: {numLockedBigDoors}, valves: {numValves}, burstvalves: {numBurstValves}\n  highestroom: {highestRoom}, nearestroomtomain: {nearestRoomToMain}\n  company mood: {currentCompanyMood.name}, meteor shower: {meteor}, meteor shower time: {meteorShowerAtTime}, num meteors: {numMeteors}\n  traps: [{trapList}]\n  outside objects: [{outsideObjectList}]\n  nearest traps: [{nearestTrapList}]\n  nearest pumpkins: [{nearestPumpkinList}]\n  distancebetweenentrances: [{entranceDistanceList}]\n  closestnesttoentrance: [{closestNestEntranceList}]\n  closestnesttoship: [{closestNestShipList}]";
         }
     }
 }

@@ -105,7 +105,8 @@ namespace LethalSeedCracker2.src.config
                 }
                 return true;
             }),
-            new ConfigFilterParser<EnemyType, Comparator, float>("closestnest", ParseEnemy, "enemy", ParseComparator, "comparator", ParseFloat, "distance", (result, enemy, op, num) => result.levelResult.closestNests.ContainsKey(enemy) && op(result.levelResult.closestNests[enemy].Min(x => x.Value), num)),
+            new ConfigFilterParser<EnemyType, Comparator, float>("closestnesttoentrance", ParseEnemy, "enemy", ParseComparator, "comparator", ParseFloat, "distance", (result, enemy, op, num) => result.levelResult.closestNestToEntrance.ContainsKey(enemy) && op(result.levelResult.closestNestToEntrance[enemy].Min(x => x.Value), num)),
+            new ConfigFilterParser<EnemyType, Comparator, float>("closestnesttoship", ParseEnemy, "enemy", ParseComparator, "comparator", ParseFloat, "distance", (result, enemy, op, num) => result.levelResult.closestNestToShip.ContainsKey(enemy) && op(result.levelResult.closestNestToShip[enemy], num)),
 
             new ConfigMetaFilterParser("[", (config, stream) => {
                 List<Predicate<CrackingResult>> filters1 = [];
