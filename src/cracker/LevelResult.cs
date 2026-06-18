@@ -173,13 +173,10 @@ namespace LethalSeedCracker2.src.cracker
                         }
                     }
 
-                    foreach (var pos in StartOfRound.Instance.playerSpawnPositions)
+                    var dist2 = (item.transform.position - StartOfRound.Instance.shipLandingPosition.position).magnitude;
+                    if (!closestNestToShip.ContainsKey(item.enemyType) || closestNestToShip[item.enemyType] < dist2)
                     {
-                        var dist = (item.transform.position - pos.position).magnitude;
-                        if (!closestNestToShip.ContainsKey(item.enemyType) || closestNestToShip[item.enemyType] < dist)
-                        {
-                            closestNestToShip[item.enemyType] = dist;
-                        }
+                        closestNestToShip[item.enemyType] = dist2;
                     }
                 }
             }
